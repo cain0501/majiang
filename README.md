@@ -46,6 +46,10 @@ node _devserver.mjs
 
 ## 部署（约 5 分钟，一次性）
 
+线上共享数据现在使用 Supabase Edge Function + PostgreSQL，GitHub Pages 直接访问：
+`https://gzstcdhxcxnjytzzcrxe.supabase.co/functions/v1/majiang-api`。
+Cloudflare Worker 仍保留作为备用入口。
+
 ```bash
 npx wrangler login                       # 弹浏览器，注册/登录 Cloudflare（免费）
 npx wrangler kv namespace create MJ_KV   # 建存储，输出一个 id

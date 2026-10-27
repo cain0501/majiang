@@ -281,7 +281,19 @@ export function applyOp(state, op, now = Date.now()) {
     }
   } else if (type === 'settings') {
     const patch = op.patch || {};
-    if (Array.isArray(patch.rooms)) session.rooms = cleanRooms(patch.rooms);
+    if (Array.isArray(patch.rooms)) {
+      const previousRooms = new Map(ensureRooms(session, now).map(room => [room.id, room]));
+      const nextRooms = cleanRooms(patch.rooms);
+      if (patch.retroactive) {
+        nextRooms.forEach(room => {
+          const previous = previousRooms.get(room.id);
+          if (previous && previous.startAt > now && room.startAt <= now && !room.startedAt) {
+            room.startedAt = room.startAt;
+          }
+        });
+      }
+      session.rooms = nextRooms;
+    }
     ensureRooms(session, now);
     normalizeRoomAssignments(session, now);
   } else if (type === 'score') {

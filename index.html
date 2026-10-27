@@ -540,6 +540,9 @@ function memberOf(state, id) {
 /* ===================== 本地状态 ===================== */
 const LS_KEY = 'mj_signup_v1';
 const GROUP = new URLSearchParams(location.search).get('g') || 'main';
+const API_ORIGIN = location.hostname === 'cain0501.github.io'
+  ? 'https://majiang.zzljb520.workers.dev'
+  : '';
 let ONLINE = false;
 let S = loadState();
 let tab = 'signup';
@@ -559,12 +562,12 @@ function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch 
 
 /* ===================== 云端同步 ===================== */
 async function apiGet(){
-  const r = await fetch('/api/state?g=' + encodeURIComponent(GROUP), { cache: 'no-store' });
+  const r = await fetch(API_ORIGIN + '/api/state?g=' + encodeURIComponent(GROUP), { cache: 'no-store' });
   if (!r.ok) throw new Error('no api');
   return await r.json();
 }
 async function apiOp(op){
-  const r = await fetch('/api/op?g=' + encodeURIComponent(GROUP), {
+  const r = await fetch(API_ORIGIN + '/api/op?g=' + encodeURIComponent(GROUP), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(op)

@@ -511,7 +511,8 @@ function historyHtml(){
       <div class="history-head"><div><b>${esc(room.roomNo || '房间')}</b><span>${esc(room.title)}</span></div><span>${fmtFull(room.startAt)}</span></div>
       <div class="history-sub">📍 ${esc(room.venue)} · ${room.durationMin} 分钟 · ${esc(names || '无人报名')}</div>
       <div class="history-sub">${result ? `已记录成绩 · 合计 ${total > 0 ? '+' : ''}${total}` : '尚未记录成绩'}</div>
-      ${isAdmin() ? `<button class="mini d history-delete" data-act="delete-room" data-id="${room.id}">删除记录</button>` : ''}
+       ${!result ? `<button class="btn btn-primary wide" data-act="score-room" data-id="${room.id}">记录本局分数</button>` : ''}
+       ${isAdmin() ? `<button class="mini d history-delete" data-act="delete-room" data-id="${room.id}">删除记录</button>` : ''}
     </div>`;
   }).join('') + '</div>';
 }

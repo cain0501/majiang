@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#04160f" />
+<title>聚会/活动报名</title>
+<style>
+  :root{
+    --felt-1:#15523d; --felt-2:#0a3527; --felt-3:#04160f;
+    --gold:#e8c56a; --gold-2:#c9a24a;
+    --tile:#fbf7ec; --tile-edge:#cfc5aa;
+    --muted:rgba(255,255,255,.5);
+    --line:rgba(255,255,255,.1);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:#fff;min-height:100vh;padding-bottom:112px;
+    background:radial-gradient(130% 90% at 50% -10%,var(--felt-1) 0%,var(--felt-2) 48%,var(--felt-3) 100%) fixed;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:22px 16px 0}
+
+  .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .hd h1{font-size:20px;margin:0 0 7px;font-weight:700;letter-spacing:.4px}
+  .meta{font-size:13px;color:var(--muted);line-height:1.75}
+  .gear{background:rgba(255,255,255,.08);border:1px solid var(--line);color:#fff;width:38px;height:38px;
+        border-radius:12px;font-size:17px;cursor:pointer;flex:0 0 auto}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;
+         background:rgba(232,197,106,.16);color:var(--gold);vertical-align:2px}
+  .whoami{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:13px;color:#dfe9e3;
+          background:rgba(255,255,255,.07);border:1px solid var(--line);
+          padding:4px 12px 4px 5px;border-radius:22px;cursor:pointer;font-family:inherit}
+  .whoami .av{width:26px;height:26px;font-size:13px}
+
+  .tabs{display:flex;gap:6px;margin:16px 0 18px;background:rgba(0,0,0,.25);padding:4px;border-radius:13px}
+  .tab{flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:14px;
+       color:var(--muted);font-weight:600;cursor:pointer;transition:.18s}
+  .tab.on{background:rgba(255,255,255,.13);color:#fff}
+
+  .cd{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:11px 14px;border-radius:12px;
+      font-size:13px;background:rgba(232,197,106,.09);border:1px solid rgba(232,197,106,.26);color:var(--gold)}
+  .cd.urgent{background:rgba(226,94,94,.12);border-color:rgba(226,94,94,.32);color:#ff9b9b}
+  .cd.closed{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--muted)}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px}
+  .stat{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:14px;
+        padding:12px 8px;text-align:center}
+  .stat b{display:block;font-size:23px;font-weight:800;letter-spacing:-.6px;line-height:1.25}
+  .stat span{font-size:11px;color:var(--muted)}
+
+  .tbl{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:16px;
+       padding:14px;margin-bottom:12px;transition:.2s}
+  .tbl.full{background:linear-gradient(180deg,rgba(232,197,106,.10),rgba(255,255,255,.025));
+            border-color:rgba(232,197,106,.32)}
+  .tbl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .tbl-hd .name{font-size:14px;font-weight:700;letter-spacing:.6px}
+  .room-title{display:block;margin-top:4px;font-size:12px;font-weight:500;letter-spacing:0;color:var(--muted)}
+  .room-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin:-3px 0 10px;color:var(--muted);font-size:11px}
+  .room-cd{margin-bottom:10px;padding:7px 10px;font-size:11px}
+  .room-card.available{border-color:rgba(232,197,106,.5);box-shadow:0 0 0 1px rgba(232,197,106,.08),0 8px 24px rgba(0,0,0,.12)}
+  .room-action{margin-top:10px}
+  .room-join{width:100%;border:0;border-radius:11px;padding:12px 10px;background:linear-gradient(180deg,#f1d486,#d3a94f);
+             color:#2b1f05;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(232,197,106,.2)}
+  .room-join:active{transform:scale(.985)}
+  .room-join.switch{background:rgba(232,197,106,.14);border:1px solid rgba(232,197,106,.38);color:var(--gold);box-shadow:none}
+  .room-join.muted{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);box-shadow:none;cursor:default}
+  .tbl-hd .st{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.1);color:var(--muted)}
+  .tbl.full .st{background:rgba(232,197,106,.18);color:var(--gold)}
+  .seats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+  .av{display:inline-grid;place-items:center;border-radius:50%;font-weight:800;color:#1b1b1b;
+      width:34px;height:34px;font-size:15px;flex:0 0 auto;overflow:hidden;line-height:1}
+  .seat{display:flex;align-items:center;gap:8px;background:var(--tile);color:#191919;border-radius:9px;
+        padding:8px 10px;font-size:14.5px;font-weight:700;min-width:0;
+        box-shadow:0 2px 0 var(--tile-edge),0 4px 10px rgba(0,0,0,.28)}
+  .seat .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .seat.me{outline:2px solid var(--gold);outline-offset:-2px}
+  .seat.empty{background:transparent;color:rgba(255,255,255,.2);box-shadow:none;justify-content:center;
+              border:1.5px dashed rgba(255,255,255,.16);font-weight:400;font-size:13px;padding:11px 6px}
+  .tbl-switch{border:0;background:transparent;color:var(--gold);font:inherit;font-size:12px;cursor:pointer;padding:3px 0 3px 8px}
+  .add-room{width:100%;margin:0 0 12px;padding:13px;border:1px dashed rgba(255,255,255,.2);border-radius:14px;
+            background:rgba(255,255,255,.025);color:var(--muted);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .add-room:active{background:rgba(255,255,255,.08);color:#fff}
+  .bar.three .btn{font-size:14px;padding-left:7px;padding-right:7px}
+
+  .waitbox{background:rgba(255,255,255,.035);border:1px dashed rgba(255,255,255,.16);
+           border-radius:14px;padding:13px 14px;margin-bottom:12px}
+  .waitbox .t{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px 3px 4px;
+        border-radius:20px;background:rgba(255,255,255,.1)}
+  .chip .av{width:20px;height:20px;font-size:10px}
+
+  .rank{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .no{width:20px;font-size:13px;color:var(--muted);font-weight:700;text-align:center}
+  .no.top{color:var(--gold)}
+  .nm2{flex:1;font-size:15px;font-weight:600;min-width:0}
+  .sub{font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+  .score{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+  .pos{color:#7fe0ad}.neg{color:#ff9b9b}
+  .empty-tip{text-align:center;color:var(--muted);font-size:13px;padding:38px 10px;line-height:1.8}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;
+       max-width:480px;margin:0 auto;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+       background:linear-gradient(180deg,rgba(4,22,15,0),rgba(4,22,15,.92) 42%,#04160f 100%)}
+  .btn{flex:1;border:0;border-radius:13px;padding:15px 10px;font-size:16px;font-weight:700;
+       font-family:inherit;cursor:pointer;transition:transform .1s}
+  .btn:active{transform:scale(.975)}
+  .btn-primary{background:linear-gradient(180deg,#f1d486,#d3a94f);color:#2b1f05;
+               box-shadow:0 6px 20px rgba(232,197,106,.26)}
+  .btn-ghost{flex:.6;background:rgba(255,255,255,.09);color:#fff}
+  .btn-danger{background:rgba(219,84,84,.15);color:#ff9d9d;border:1px solid rgba(219,84,84,.34)}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .wide{width:100%;margin-top:10px}
+
+  .mask{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;
+        background:rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+  .sheet{width:100%;max-width:480px;background:#0d2b21;border-radius:20px 20px 0 0;
+         padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+         animation:up .22s cubic-bezier(.2,.8,.3,1);max-height:88vh;overflow:auto}
+  @keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+  .sheet h3{margin:0 0 6px;font-size:17px}
+  .sheet p.hint{margin:0 0 16px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  input,select,textarea{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);color:#fff;
+               padding:12px;border-radius:11px;font-size:16px;font-family:inherit;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold-2)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .actions{display:flex;gap:10px;margin-top:18px}
+  .actions .btn{padding:14px 10px;font-size:15px}
+
+  .pick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 4px}
+  .pick-item{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;
+             padding:13px 6px;color:#fff;font-family:inherit;font-size:13px;display:flex;
+             flex-direction:column;align-items:center;gap:8px;cursor:pointer;min-width:0}
+  .pick-item:active{background:rgba(255,255,255,.14)}
+  .pick-item .nm3{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .av.lg{width:50px;height:50px;font-size:22px}
+
+  .row-edit{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .row-edit .av{width:36px;height:36px;font-size:15px}
+  .row-edit input{flex:1;padding:10px;font-size:15px;min-width:0}
+  .row-edit select{width:64px;padding:9px 2px;font-size:16px;flex:0 0 auto}
+  .room-edit{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .room-edit span{width:58px;flex:0 0 auto;font-size:13px;color:var(--muted)}
+  .room-edit input{flex:1;padding:10px;font-size:15px;min-width:0}
+  .room-config{margin:0 0 14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}
+  .room-config-title{margin-bottom:10px;font-size:13px;font-weight:700;color:var(--gold)}
+  .room-config .field{margin-bottom:9px}
+  .del{background:rgba(219,84,84,.15);border:1px solid rgba(219,84,84,.3);color:#ff9d9d;
+       width:36px;height:36px;border-radius:10px;font-size:17px;cursor:pointer;flex:0 0 auto;font-family:inherit}
+
+  .list-item{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .list-item input{width:76px;text-align:center;padding:9px 6px;font-size:15px;flex:0 0 auto}
+
+  .score-row{display:flex;align-items:center;gap:9px;padding:11px 12px;border:1px solid var(--line);
+             border-radius:13px;margin-bottom:9px;background:rgba(255,255,255,.04)}
+  .score-row .nm2{flex:1;min-width:0}
+  .badge2{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.1);
+          color:var(--muted);white-space:nowrap;flex:0 0 auto}
+  .badge2.ok{background:rgba(127,224,173,.15);color:#7fe0ad}
+  .badge2.warn{background:rgba(255,155,155,.15);color:#ff9b9b}
+  .mini{flex:0 0 auto;border:0;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;
+        font-family:inherit;cursor:pointer}
+  .mini.p{background:rgba(232,197,106,.16);color:var(--gold)}
+  .mini.d{background:rgba(219,84,84,.14);color:#ff9d9d}
+  .sumline{text-align:right;font-size:13px;color:var(--muted);margin-top:6px}
+  .sumline b{font-size:20px;color:#fff;font-variant-numeric:tabular-nums;margin-left:4px}
+  .sumline b.bad{color:#ff9b9b}
+  .sumline b.good{color:#7fe0ad}
+  .history-list{display:grid;gap:10px}
+  .history-card{padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.045)}
+  .history-head{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+  .history-head b{margin-right:8px;color:var(--gold)}
+  .history-head span{color:var(--muted);font-size:11px}
+  .history-sub{margin-top:7px;color:var(--muted);font-size:12px;line-height:1.5}
+  .admin-badge{font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(232,197,106,.18);color:var(--gold)}
+
+  .toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99;
+         background:rgba(0,0,0,.82);padding:13px 22px;border-radius:12px;font-size:14px;
+         animation:fade .2s;pointer-events:none;max-width:80vw;text-align:center;line-height:1.6}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const ADMIN_NAME = '该隐cain';
+
+function rid(prefix) {
+  return prefix + Math.random().toString(36).slice(2, 8);
+}
+
+function avatarColor(name) {
+  const s = String(name || '?');
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+  return 'hsl(' + h + ', 58%, 63%)';
+}
+
+function nextFridayCN(now = Date.now()) {
+  const d = new Date(now + 8 * 3600e3);
+  const add = (5 - d.getUTCDay() + 7) % 7;
+  const t = new Date(d.getTime());
+  t.setUTCDate(d.getUTCDate() + add);
+  t.setUTCHours(19, 30, 0, 0);
+  if (t.getTime() <= d.getTime()) t.setUTCDate(t.getUTCDate() + 7);
+  return t.getTime() - 8 * 3600e3;
+}
+
+function blankRoom(now = Date.now(), index = 1, defaults = {}) {
+  return {
+    id: rid('r'),
+    roomNo: String(index),
+    title: defaults.title || '活动报名',
+    venue: defaults.venue || '待定',
+    startAt: Number(defaults.startAt) || nextFridayCN(now),
+    durationMin: Number(defaults.durationMin) || 180,
+    deadlineMin: Number.isFinite(defaults.deadlineMin) ? defaults.deadlineMin : 120
+  };
+}
+
+function blankSession(now = Date.now()) {
+  return {
+    id: rid('s'),
+    rooms: [blankRoom(now, 1)],
+    capacity: 4,
+    players: []
+  };
+}
+
+function defaultState(now = Date.now()) {
+  return { members: [], session: blankSession(now), history: [], archivedRooms: [], updatedAt: now };
+}
+
+function cleanMembers(list) {
+  const out = [];
+  (Array.isArray(list) ? list : []).forEach(m => {
+    if (!m) return;
+    const name = String(m.name || '').trim().slice(0, 8);
+    if (!name) return;
+    out.push({
+      id: m.id || rid('m'),
+      name,
+      emoji: String(m.emoji || '').slice(0, 4),
+      color: m.color || avatarColor(name),
+      credit: m.credit == null ? 100 : Math.max(0, Math.min(100, Number(m.credit) || 0))
+    });
+  });
+  return out;
+}
+
+function cleanRooms(list, defaults = {}) {
+  return (Array.isArray(list) ? list : []).slice(0, 10).map((room, i) => ({
+    id: room && room.id ? room.id : rid('r'),
+    roomNo: String(room && (room.roomNo || room.name) || i + 1).trim().slice(0, 20) || String(i + 1),
+    title: String(room && room.title || defaults.title || '活动报名').trim().slice(0, 20) || '活动报名',
+    venue: String(room && room.venue || defaults.venue || '待定').trim().slice(0, 40) || '待定',
+    startAt: Number(room && room.startAt) || Number(defaults.startAt) || nextFridayCN(),
+    durationMin: Math.max(30, Math.min(720, Number(room && room.durationMin) || Number(defaults.durationMin) || 180)),
+    deadlineMin: Math.max(0, Math.min(2880, Number.isFinite(room && room.deadlineMin) ? room.deadlineMin : (Number.isFinite(defaults.deadlineMin) ? defaults.deadlineMin : 120))),
+    ...(Number(room && room.startedAt) ? { startedAt: Number(room.startedAt) } : {})
+  }));
+}
+
+function ensureRooms(session, now = Date.now()) {
+  if (Array.isArray(session.rooms) && session.rooms.length === 0) {
+    session.capacity = 0;
+    return [];
+  }
+
+  const raw = Array.isArray(session.rooms) ? session.rooms : [];
+  const rich = raw.some(room => room && (room.title || room.startAt || room.venue || room.durationMin));
+  if (!raw.length || !rich) {
+    const active = Array.isArray(session.players) ? session.players.filter(p => p && !p.cancelled) : [];
+    const legacyMax = active.reduce((max, p) => Math.max(max, Number(p.tableNo) || 0), 0);
+    const legacyCount = Math.max(1, Math.max(legacyMax, Math.ceil(active.length / 4)));
+    const count = Math.min(10, legacyCount);
+    const defaults = {
+      title: session.title,
+      venue: session.venue,
+      startAt: session.startAt,
+      deadlineMin: session.deadlineMin
+    };
+    session.rooms = Array.from({ length: count }, (_, i) => blankRoom(now, i + 1, defaults));
+    raw.forEach((room, i) => {
+      if (session.rooms[i] && room) {
+        if (room.name) session.rooms[i].roomNo = String(room.name).trim().slice(0, 20) || String(i + 1);
+        if (room.id) session.rooms[i].id = room.id;
+      }
+    });
+  } else {
+    session.rooms = cleanRooms(raw);
+  }
+  session.capacity = session.rooms.length * 4;
+  return session.rooms;
+}
+
+function roomEndAt(room) {
+  return Number(room.startAt) + Number(room.durationMin || 180) * 60000;
+}
+
+function deadlineOf(room) {
+  return Number(room.startAt) - Number(room.deadlineMin || 0) * 60000;
+}
+
+function normalizeRoomAssignments(session, now = Date.now()) {
+  const rooms = ensureRooms(session, now);
+  const occupied = new Map(rooms.map(room => [room.id, 0]));
+  session.players
+    .filter(p => !p.cancelled)
+    .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0))
+    .forEach(player => {
+      const room = rooms.find(item => item.id === player.roomId);
+      if (room && now >= roomEndAt(room)) return;
+      if (room && now < roomEndAt(room) && occupied.get(room.id) < 4) {
+        occupied.set(room.id, occupied.get(room.id) + 1);
+        return;
+      }
+      const next = rooms.find(item => now < roomEndAt(item) && occupied.get(item.id) < 4);
+      if (next) {
+        player.roomId = next.id;
+        occupied.set(next.id, occupied.get(next.id) + 1);
+      } else {
+        delete player.roomId;
+      }
+    });
+}
+
+function archiveEndedRooms(state, now = Date.now()) {
+  const session = state.session;
+  const rooms = ensureRooms(session, now);
+  const activeCount = room => session.players.filter(player => !player.cancelled && player.roomId === room.id).length;
+  const notStarted = rooms.filter(room => now >= room.startAt && !room.startedAt && activeCount(room) < 4);
+  rooms.forEach(room => {
+    if (now >= room.startAt && activeCount(room) >= 4) room.startedAt = room.startedAt || room.startAt;
+  });
+  const ended = rooms.filter(room => now >= roomEndAt(room) && room.startedAt);
+  const removeIds = new Set([...notStarted, ...ended].map(room => room.id));
+  if (!removeIds.size) return;
+  state.archivedRooms = Array.isArray(state.archivedRooms) ? state.archivedRooms : [];
+  ended.forEach(room => {
+    if (state.archivedRooms.some(item => item.id === room.id)) return;
+    state.archivedRooms.push({
+      ...room,
+      endedAt: roomEndAt(room),
+      players: session.players.filter(player => player.roomId === room.id),
+      results: state.history.filter(entry => entry.roomId === room.id)
+    });
+  });
+  session.rooms = rooms.filter(room => !removeIds.has(room.id));
+  session.players = session.players.filter(player => !removeIds.has(player.roomId));
+  session.capacity = session.rooms.length * 4;
+}
+
+function normalizeState(st, now = Date.now()) {
+  if (!st || typeof st !== 'object' || !st.session) return defaultState(now);
+
+  st.members = cleanMembers(st.members);
+  st.history = Array.isArray(st.history) ? st.history : [];
+  st.archivedRooms = Array.isArray(st.archivedRooms) ? st.archivedRooms : [];
+  st.session.players = Array.isArray(st.session.players) ? st.session.players : [];
+
+  const byName = name => st.members.find(member => member.name === name);
+  const make = name => {
+    const member = { id: rid('m'), name: String(name).slice(0, 8), emoji: '', color: avatarColor(name) };
+    st.members.push(member);
+    return member;
+  };
+
+  st.session.players = st.session.players.map(player => {
+    if (!player) return null;
+    if (player.memberId) return { ...player };
+    if (!player.name) return null;
+    const member = byName(player.name) || make(player.name);
+    return {
+      memberId: member.id,
+      roomId: player.roomId,
+      joinedAt: player.joinedAt || now,
+      cancelled: !!player.cancelled,
+      credit: player.credit == null ? 100 : player.credit
+    };
+  }).filter(Boolean);
+
+  const rooms = ensureRooms(st.session, now);
+  st.session.players.forEach(player => {
+    if (!player.roomId && player.tableNo) player.roomId = rooms[Number(player.tableNo) - 1]?.id;
+    delete player.tableNo;
+  });
+  normalizeRoomAssignments(st.session, now);
+
+  st.history = st.history.map(entry => {
+    if (!entry) return null;
+    const room = entry.roomId
+      ? rooms.find(item => item.id === entry.roomId)
+      : rooms[(Number(entry.tableNo) || 1) - 1];
+    return {
+      ...entry,
+      roomId: entry.roomId || (room && room.id) || '',
+      roomNo: entry.roomNo || (room && room.roomNo) || String(entry.tableNo || 1),
+      title: entry.title || (room && room.title) || '活动报名',
+      venue: entry.venue || (room && room.venue) || '待定',
+      startAt: entry.startAt || entry.date || (room && room.startAt) || now,
+      results: (Array.isArray(entry.results) ? entry.results : []).map(result => {
+        if (!result) return null;
+        if (result.memberId) return { memberId: result.memberId, score: Number(result.score) || 0 };
+        if (!result.name) return null;
+        const member = byName(result.name) || make(result.name);
+        return { memberId: member.id, score: Number(result.score) || 0 };
+      }).filter(Boolean)
+    };
+  }).filter(Boolean);
+
+  archiveEndedRooms(st, now);
+  st.members.forEach(member => {
+    if (member.credit == null) member.credit = 100;
+    st.session.players.forEach(player => {
+      if (player.memberId === member.id && player.credit != null && player.credit < member.credit) member.credit = player.credit;
+    });
+  });
+  return st;
+}
+
+function applyOp(state, op, now = Date.now()) {
+  normalizeState(state, now);
+  const session = state.session;
+  const type = op && op.t;
+  const members = Array.isArray(state.members) ? state.members : (state.members = []);
+  const rooms = () => ensureRooms(session, now);
+
+  if (type === 'members') {
+    state.members = cleanMembers(op.list);
+    const ids = new Set(state.members.map(member => member.id));
+    session.players = session.players.filter(player => ids.has(player.memberId));
+  } else if (type === 'join') {
+    const memberId = String(op.memberId || '');
+    const roomList = rooms();
+    const room = roomList.find(item => item.id === op.roomId) || roomList.find(item => now < deadlineOf(item));
+    if (members.some(member => member.id === memberId) && room && now < deadlineOf(room)) {
+      const existing = session.players.find(player => player.memberId === memberId && !player.cancelled);
+      const occupied = session.players.filter(player => !player.cancelled && player.roomId === room.id && player.memberId !== memberId).length;
+      if (!existing && occupied < 4) {
+        const old = session.players.find(player => player.memberId === memberId);
+        if (old) {
+          old.cancelled = false;
+          old.joinedAt = now;
+          old.roomId = room.id;
+        } else {
+          session.players.push({ memberId, roomId: room.id, joinedAt: now, cancelled: false });
+        }
+      }
+    }
+  } else if (type === 'move') {
+    const memberId = String(op.memberId || '');
+    const room = rooms().find(item => item.id === op.roomId);
+    const player = session.players.find(item => item.memberId === memberId && !item.cancelled);
+    const occupied = room ? session.players.filter(item => !item.cancelled && item.roomId === room.id && item.memberId !== memberId).length : 4;
+    if (player && room && now < deadlineOf(room) && occupied < 4) player.roomId = room.id;
+  } else if (type === 'leave') {
+    const player = session.players.find(item => item.memberId === op.memberId && !item.cancelled);
+    if (player) {
+      player.cancelled = true;
+      const room = rooms().find(item => item.id === player.roomId);
+      if (room && now > deadlineOf(room)) {
+        const member = members.find(item => item.id === op.memberId);
+        if (member) member.credit = Math.max(0, (member.credit == null ? 100 : member.credit) - 10);
+      }
+    }
+  } else if (type === 'settings') {
+    const patch = op.patch || {};
+    if (Array.isArray(patch.rooms)) session.rooms = cleanRooms(patch.rooms);
+    ensureRooms(session, now);
+    normalizeRoomAssignments(session, now);
+  } else if (type === 'score') {
+    const room = rooms().find(item => item.id === op.roomId)
+      || state.archivedRooms.find(item => item.id === op.roomId);
+    const results = (Array.isArray(op.results) ? op.results : [])
+      .filter(result => result && result.memberId)
+      .map(result => ({ memberId: result.memberId, score: Number(result.score) || 0 }));
+    if (room && results.length) {
+      state.history = state.history.filter(entry => !(entry.roomId === room.id));
+      const entry = {
+        id: op.id || rid('h'),
+        roomId: room.id,
+        roomNo: room.roomNo,
+        title: room.title,
+        venue: room.venue,
+        startAt: room.startAt,
+        results
+      };
+      state.history.push(entry);
+      const archived = state.archivedRooms.find(item => item.id === room.id);
+      if (archived) archived.results = [entry];
+    }
+  } else if (type === 'unscore') {
+    state.history = state.history.filter(entry => entry.id !== op.id);
+  } else if (type === 'delete-room') {
+    const actor = members.find(member => member.id === op.actorMemberId);
+    if (actor && actor.name === ADMIN_NAME && op.roomId) {
+      session.rooms = session.rooms.filter(room => room.id !== op.roomId);
+      session.players = session.players.filter(player => player.roomId !== op.roomId);
+      state.history = state.history.filter(entry => entry.roomId !== op.roomId);
+      state.archivedRooms = state.archivedRooms.filter(room => room.id !== op.roomId);
+      session.capacity = session.rooms.length * 4;
+    }
+  } else if (type === 'reset') {
+    state.prev = { session: JSON.parse(JSON.stringify(session)), at: now };
+    const fresh = blankSession(now);
+    fresh.rooms = rooms().map((room, i) => ({ ...room, id: rid('r'), startAt: nextFridayCN(now), roomNo: room.roomNo || String(i + 1) }));
+    fresh.capacity = fresh.rooms.length * 4;
+    state.session = fresh;
+  } else if (type === 'restore') {
+    if (state.prev && state.prev.session) {
+      state.session = state.prev.session;
+      state.prev = null;
+    }
+  }
+
+  normalizeState(state, now);
+  state.updatedAt = now;
+  return state;
+}
+
+function activePlayers(state) {
+  return state.session.players
+    .filter(player => !player.cancelled)
+    .sort((a, b) => a.joinedAt - b.joinedAt);
+}
+
+function memberOf(state, id) {
+  return (state.members || []).find(member => member.id === id) || null;
+}
+
+
+/* ===================== 本地状态 ===================== */
+const LS_KEY = 'mj_signup_v1';
+const GROUP = new URLSearchParams(location.search).get('g') || 'main';
+let ONLINE = false;
+let S = loadState();
+let tab = 'signup';
+let modal = null;
+let outbox = [];       // 还没成功发出去的动作，断网也不会丢
+let flushing = false;
+
+function loadState(){
+  let raw = null;
+  try { raw = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) {}
+  const st = normalizeState(raw || defaultState());
+  st.memberId = (raw && raw.memberId) || null;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(st)); } catch (e) {}
+  return st;
+}
+function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ===================== 云端同步 ===================== */
+async function apiGet(){
+  const r = await fetch('/api/state?g=' + encodeURIComponent(GROUP), { cache: 'no-store' });
+  if (!r.ok) throw new Error('no api');
+  return await r.json();
+}
+async function apiOp(op){
+  const r = await fetch('/api/op?g=' + encodeURIComponent(GROUP), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(op)
+  });
+  if (!r.ok) throw new Error('op failed');
+  return await r.json();
+}
+function adopt(d){
+  S.members = d.members || [];
+  S.session = d.session;
+  S.history = d.history || [];
+  S.archivedRooms = d.archivedRooms || [];
+  S.updatedAt = d.updatedAt;
+  if (S.memberId && !memberOf(S, S.memberId)) S.memberId = null;
+  save();
+  render();
+  if (!S.memberId) askWho();
+}
+// 本地立刻生效，再把动作排队发给服务器。发失败就留着，下次自动重试。
+function commit(op){
+  applyOp(S, op, Date.now());
+  save();
+  render();
+  if (!ONLINE) return;
+  outbox.push(op);
+  flush();
+}
+
+async function flush(){
+  if (flushing || !outbox.length) return;
+  flushing = true;
+  let last = null;
+  while (outbox.length){
+    try {
+      last = await apiOp(outbox[0]);
+      outbox.shift();
+    } catch (e) {
+      break; // 网络不好，留到下次
+    }
+  }
+  flushing = false;
+  if (last && !outbox.length) adopt(last);
+}
+
+/* ===================== 小工具 ===================== */
+const pad = n => String(n).padStart(2, '0');
+const WD = '日一二三四五六';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+const fmtDay = ts => { const d = new Date(ts); return `${d.getMonth()+1}月${d.getDate()}日 周${WD[d.getDay()]}`; };
+const fmtHM = ts => { const d = new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const fmtFull = ts => `${fmtDay(ts)} ${fmtHM(ts)}`;
+
+const av = m => (m && (m.emoji || m.name.slice(0, 1))) || '?';
+const avHtml = (m, cls) => `<span class="av ${cls||''}" style="background:${m ? m.color : '#555'}">${esc(av(m))}</span>`;
+const meM = () => (S.memberId ? memberOf(S, S.memberId) : null);
+const isAdmin = () => meM() && meM().name === '该隐cain';
+const mePlayer = () => S.session.players.find(p => p.memberId === S.memberId && !p.cancelled) || null;
+const roomCount = state => Math.min(10, Array.isArray(state.session.rooms) ? state.session.rooms.length : 0);
+const roomName = (state, index) => {
+  const room = state.session.rooms && state.session.rooms[index];
+  const value = String(room && room.roomNo || '').trim();
+  return !value || value === String(index + 1) ? `房间 ${index + 1}` : value;
+};
+const roomOf = (state, id) => (state.session.rooms || []).find(room => room.id === id) || null;
+const roomRecordOf = (state, id) => roomOf(state, id) || (state.archivedRooms || []).find(room => room.id === id) || null;
+const playersForRoom = (state, room) => activePlayers(state).filter(player => player.roomId === room.id);
+const roomNoOf = player => {
+  const index = (S.session.rooms || []).findIndex(room => room.id === (player && player.roomId));
+  return index < 0 ? 0 : index + 1;
+};
+const seated = () => activePlayers(S).filter(player => roomOf(S, player.roomId));
+const waiting = () => activePlayers(S).filter(player => !roomOf(S, player.roomId));
+const roomGroups = state => {
+  const assigned = activePlayers(state).filter(player => roomOf(state, player.roomId));
+  return Array.from({ length: roomCount(state) }, (_, i) =>
+    assigned.filter(player => player.roomId === state.session.rooms[i].id)
+  );
+};
+const toLocalInput = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const roomStatus = (room, now = Date.now()) => {
+  if (now >= roomEndAt(room)) return { cls: 'closed', text: '已结束' };
+  if (now >= room.startAt) return { cls: 'urgent', text: `进行中 · ${fmtHM(roomEndAt(room))} 结束` };
+  if (now >= deadlineOf(room)) return { cls: 'closed', text: '报名已截止' };
+  const left = deadlineOf(room) - now;
+  const h = Math.floor(left / 3600000), m = Math.floor((left % 3600000) / 60000);
+  return { cls: left < 3600000 ? 'urgent' : '', text: `报名截止 ${fmtHM(deadlineOf(room))} · 还剩 ${h > 0 ? h + ' 小时 ' + m + ' 分' : m + ' 分钟'}` };
+};
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1700);
+}
+
+/* ===================== 渲染 ===================== */
+const app = document.getElementById('app');
+
+function render(){
+  const s = S.session;
+  const all = activePlayers(S);
+  const waitList = waiting();
+  const rooms = s.rooms || [];
+  const groups = roomGroups(S);
+  const openSeats = groups.reduce((sum, roomPlayers) => sum + (4 - roomPlayers.length), 0);
+  const me = meM();
+  const joined = !!mePlayer();
+  const currentRoom = mePlayer() ? roomOf(S, mePlayer().roomId) : null;
+
+  const now = Date.now();
+  let roomsHtml = '';
+  rooms.forEach((room, i) => {
+    const players = groups[i] || [];
+    const full = players.length === 4;
+    const status = roomStatus(room, now);
+    const mine = currentRoom && currentRoom.id === room.id;
+    const canJoin = !joined && now < deadlineOf(room) && now < roomEndAt(room) && !full;
+    const canMove = joined && !mine && now < deadlineOf(room) && now < roomEndAt(room) && !full;
+    let seats = '';
+    for (let k = 0; k < 4; k++){
+      const p = players[k];
+      const m = p ? memberOf(S, p.memberId) : null;
+      if (p && m){
+        seats += `<div class="seat${m.id === S.memberId ? ' me' : ''}">${avHtml(m)}<span class="nm">${esc(m.name)}</span></div>`;
+      } else {
+        seats += `<div class="seat empty">${k === players.length ? '下一位' : '虚位'}</div>`;
+      }
+    }
+    const editButton = `<button class="tbl-switch" data-act="edit-room" data-id="${room.id}">编辑</button>`;
+    const available = (!joined && !!me && canJoin) || canMove;
+    const action = mine
+      ? '<span class="badge2 ok">当前房间</span>'
+      : `<span class="badge2">${full ? '已满' : status.text === '报名已截止' || status.text === '已结束' ? status.text : ''}</span>`;
+    const roomButton = mine
+      ? '<div class="room-action"><div class="room-join muted">你已报名这个房间</div></div>'
+      : canJoin
+        ? `<div class="room-action"><button class="room-join" data-act="join-room" data-id="${room.id}">报名此房间</button></div>`
+        : canMove
+          ? `<div class="room-action"><button class="room-join switch" data-act="move-to" data-id="${room.id}">换到这个房间</button></div>`
+          : !joined && !me && now < deadlineOf(room) && now < roomEndAt(room)
+            ? '<div class="room-action"><button class="room-join muted" data-act="who">先选择身份，再报名</button></div>'
+            : '';
+    roomsHtml += `<div class="tbl room-card${full ? ' full' : ''}${available ? ' available' : ''}">
+        <div class="tbl-hd">
+          <div class="name">${esc(roomName(S, i))}<span class="room-title">${esc(room.title)}</span></div>
+          <div><span class="st">${players.length}/4${full ? ' · 已满' : ' · 还差 ' + (4 - players.length)}</span>${editButton}${action}</div>
+        </div>
+        <div class="room-meta"><span>📍 ${esc(room.venue)}</span><span>🕐 ${fmtFull(room.startAt)}</span><span>⏱ ${room.durationMin} 分钟</span></div>
+        <div class="cd room-cd ${status.cls}">${status.text}</div>
+        <div class="seats">${seats}</div>
+        ${roomButton}
+      </div>`;
+  });
+
+  let waitHtml = '';
+  if (waitList.length){
+    waitHtml = `<div class="waitbox">
+      <div class="t">候补 ${waitList.length} 人（当前开放 ${roomCount(S)} 个房间，去 ⚙ 里调整房间数量）</div>
+      <div class="chips">${waitList.map(p => {
+        const m = memberOf(S, p.memberId);
+        return m ? `<span class="chip">${avHtml(m)}${esc(m.name)}</span>` : '';
+      }).join('')}</div>
+    </div>`;
+  }
+  const addRoomHtml = roomCount(S) < 10
+    ? '<button class="add-room" data-act="add-room">＋ 添加房间</button>'
+    : '';
+  const pendingArchiveHtml = (S.archivedRooms || [])
+    .filter(room => !(room.results || []).length)
+    .sort((a, b) => b.endedAt - a.endedAt)
+    .map(room => {
+      const players = room.players || [];
+      const names = players.map(player => memberOf(S, player.memberId)).filter(Boolean);
+      return `<div class="tbl room-card full archived-pending">
+        <div class="tbl-hd"><div class="name">${esc(room.roomNo)}<span class="room-title">${esc(room.title)}</span></div><span class="badge2 warn">本局已结束</span></div>
+        <div class="room-meta"><span>📍 ${esc(room.venue)}</span><span>🕐 ${fmtFull(room.startAt)}</span><span>⏱ ${room.durationMin} 分钟</span></div>
+        <div class="seats">${Array.from({ length: 4 }, (_, i) => names[i]
+          ? `<div class="seat">${avHtml(names[i])}<span class="nm">${esc(names[i].name)}</span></div>`
+          : '<div class="seat empty">空位</div>').join('')}</div>
+        <button class="btn btn-primary wide" data-act="score-room" data-id="${room.id}">记录本局分数</button>
+        ${isAdmin() ? `<button class="mini d wide history-delete" data-act="delete-room" data-id="${room.id}">删除这个房间</button>` : ''}
+      </div>`;
+    }).join('');
+
+  /* 排行 */
+  const rankList = buildRank();
+  let rankHtml;
+  if (!S.members.length){
+    rankHtml = `<div class="empty-tip">还没有成员名单<br>点右上角 ⚙ → 成员管理，先把群里的 13 个人建好</div>`;
+  } else if (!rankList.some(r => r.games > 0)){
+    rankHtml = `<div class="empty-tip">还没有战绩<br>打完一局，点右上角 ⚙ 记分就会出现在这里</div>`;
+  } else {
+    rankHtml = '<div class="rank">' + rankList.filter(r => r.games > 0 || r.credit < 100).map((r, i) => `
+      <div class="row">
+        <div class="no${i < 3 ? ' top' : ''}">${i + 1}</div>
+        ${avHtml(r.m)}
+        <div class="nm2">${esc(r.m.name)}<div class="sub">${r.games} 局 · 胜率 ${r.games ? Math.round(r.wins / r.games * 100) : 0}% · 信用 ${r.credit}</div></div>
+        <div class="score ${r.total >= 0 ? 'pos' : 'neg'}">${r.total > 0 ? '+' : ''}${r.total}</div>
+      </div>`).join('') + '</div>';
+  }
+
+  /* 底部按钮：报名会截止，但退出永远可以点 */
+  let btnLabel, btnCls, disabled = false;
+  if (joined){ btnLabel = '取消报名'; btnCls = 'btn btn-danger'; }
+  else if (!me){ btnLabel = '先选你是谁'; btnCls = 'btn btn-primary'; }
+  else { btnLabel = '请在房间卡片报名'; btnCls = 'btn btn-ghost'; disabled = true; }
+
+  const whoHtml = me
+    ? `<div class="whoami" data-act="who">${avHtml(me)}<span>${esc(me.name)}</span>${isAdmin() ? '<span class="admin-badge">管理员</span>' : ''}<span style="opacity:.5">· 切换</span></div>`
+    : `<div class="whoami" data-act="who"><span style="padding-left:8px">👤 还没选你是谁</span></div>`;
+
+  app.innerHTML = `
+    <div class="wrap">
+      <div class="hd">
+        <div>
+          <h1>聚会/活动报名</h1>
+          <div class="meta">当前开放 ${rooms.length} 个房间 · 每个房间最多 4 人<br>${currentRoom ? `你已报名：${esc(roomName(S, rooms.indexOf(currentRoom)))}` : '请选择一个房间报名'}</div>
+          ${whoHtml}
+        </div>
+        <button class="gear" data-act="settings">⚙</button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab ${tab === 'signup' ? 'on' : ''}" data-act="tab" data-tab="signup">报名</div>
+        <div class="tab ${tab === 'rank' ? 'on' : ''}" data-act="tab" data-tab="rank">排行</div>
+        <div class="tab ${tab === 'history' ? 'on' : ''}" data-act="tab" data-tab="history">历史</div>
+      </div>
+
+      ${tab === 'signup' ? `
+        <div class="stats">
+          <div class="stat"><b>${all.length}</b><span>已报名</span></div>
+          <div class="stat"><b>${groups.filter(roomPlayers => roomPlayers.length === 4).length}</b><span>已满的房间</span></div>
+          <div class="stat"><b>${waitList.length || openSeats}</b><span>${waitList.length ? '候补人数' : '剩余空位'}</span></div>
+        </div>
+        ${roomsHtml}
+        ${pendingArchiveHtml}
+        ${addRoomHtml}
+        ${waitHtml}
+      ` : tab === 'rank' ? rankHtml : historyHtml()}
+    </div>
+
+    <div class="bar${joined ? ' three' : ''}">
+      <button class="btn btn-ghost" data-act="share">复制文案</button>
+      ${joined ? '<button class="btn btn-ghost" data-act="move-table">换房间</button>' : ''}
+      <button class="${btnCls}" data-act="toggle" ${disabled ? 'disabled' : ''}>${btnLabel}</button>
+    </div>`;
+}
+
+function buildRank(){
+  const map = new Map();
+  const put = id => {
+    if (!map.has(id)) map.set(id, { id, games: 0, total: 0, wins: 0 });
+    return map.get(id);
+  };
+  S.members.forEach(m => put(m.id));
+  (S.history || []).forEach(h => (h.results || []).forEach(r => {
+    const e = put(r.memberId);
+    e.games++;
+    e.total += r.score;
+    if (r.score > 0) e.wins++;
+  }));
+  return [...map.values()]
+    .map(e => {
+      const m = memberOf(S, e.id);
+      return { ...e, m, credit: m && m.credit != null ? m.credit : 100 };
+    })
+    .filter(e => e.m)
+    .sort((a, b) => b.total - a.total || b.games - a.games);
+}
+
+/* 本局已经录过的房间 */
+function entryOf(roomId){
+  return (S.history || []).find(h => h.roomId === roomId) || null;
+}
+
+function historyHtml(){
+  const archived = Array.isArray(S.archivedRooms) ? [...S.archivedRooms].sort((a, b) => b.endedAt - a.endedAt) : [];
+  if (!archived.length) return '<div class="empty-tip">还没有已结束的房间</div>';
+  return '<div class="history-list">' + archived.map(room => {
+    const names = (room.players || []).map(player => (memberOf(S, player.memberId) || {}).name).filter(Boolean).join('、');
+    const result = (room.results || [])[0];
+    const total = result ? result.results.reduce((sum, item) => sum + item.score, 0) : null;
+    return `<div class="history-card">
+      <div class="history-head"><div><b>${esc(room.roomNo || '房间')}</b><span>${esc(room.title)}</span></div><span>${fmtFull(room.startAt)}</span></div>
+      <div class="history-sub">📍 ${esc(room.venue)} · ${room.durationMin} 分钟 · ${esc(names || '无人报名')}</div>
+      <div class="history-sub">${result ? `已记录成绩 · 合计 ${total > 0 ? '+' : ''}${total}` : '尚未记录成绩'}</div>
+      ${isAdmin() ? `<button class="mini d history-delete" data-act="delete-room" data-id="${room.id}">删除记录</button>` : ''}
+    </div>`;
+  }).join('') + '</div>';
+}
+
+/* ===================== 弹层 ===================== */
+const EMOJIS = ['', '🀄', '🀅', '🐯', '🐼', '🦊', '🐷', '🐵', '🐶', '🐱', '🦁', '🐸', '🐔', '🦉',
+                '🍺', '🍉', '🍜', '🎩', '👑', '🃏', '🎲', '🎯', '😎', '🤠', '👻', '⭐', '🔥', '💎'];
+
+function sheet(inner){
+  return `<div class="mask" data-act="mask"><div class="sheet">${inner}</div></div>`;
+}
+
+/* 记分时实时算合计，不归零就把按钮文案改掉 */
+function updateSum(){
+  const inputs = [...document.querySelectorAll('[data-score]')];
+  if (!inputs.length) return;
+  const sum = inputs.reduce((a, i) => a + (parseInt(i.value, 10) || 0), 0);
+  const el = document.getElementById('sum');
+  const btn = document.getElementById('save-score-btn');
+  if (el){ el.textContent = (sum > 0 ? '+' : '') + sum; el.className = sum === 0 ? 'good' : 'bad'; }
+  if (btn) btn.textContent = sum === 0 ? '存进战绩' : `合计 ${sum > 0 ? '+' : ''}${sum}，仍然保存`;
+}
+
+function renderModal(){
+  const old = document.querySelector('.mask');
+  if (old) old.remove();
+  if (!modal) return;
+
+  let html = '';
+
+  if (modal.type === 'who'){
+    const list = S.members;
+    html = sheet(`
+      <h3>你是哪位？</h3>
+      <p class="hint">点一下自己就行。以后打开这个链接，自动就认得你了，不用再选。</p>
+      ${list.length
+        ? `<div class="pick">${list.map(m => `
+            <button class="pick-item" data-act="pick" data-id="${m.id}">
+              ${avHtml(m, 'lg')}<span class="nm3">${esc(m.name)}</span>
+            </button>`).join('')}</div>`
+        : `<div class="empty-tip" style="padding:22px 10px">还没有成员名单。<br>先让群主把 13 个人建好，或者你自己加一个。</div>`}
+      <button class="btn btn-ghost wide" data-act="add-self">＋ 不在名单里，加我一个</button>
+      <button class="btn btn-ghost wide" data-act="roster" style="background:transparent;border:1px solid var(--line)">管理成员名单</button>
+    `);
+  }
+  else if (modal.type === 'roster'){
+    html = sheet(`
+      <h3>成员名单</h3>
+      <p class="hint">把群里 13 个人都建好，报名时大家只从这里面选，名字不会乱，排行榜也准。</p>
+      ${modal.list.map((m, i) => `
+        <div class="row-edit" data-row="${i}">
+          ${avHtml(m)}
+          <input data-name value="${esc(m.name)}" maxlength="8" placeholder="名字">
+          <select data-emoji>${EMOJIS.map(e => `<option value="${e}"${e === (m.emoji || '') ? ' selected' : ''}>${e || '字'}</option>`).join('')}</select>
+          <button class="del" data-act="roster-del" data-i="${i}">×</button>
+        </div>`).join('')}
+      <button class="btn btn-ghost wide" data-act="roster-add">＋ 添加成员</button>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">取消</button>
+        <button class="btn btn-primary" data-act="roster-save">保存名单</button>
+      </div>`);
+  }
+  else if (modal.type === 'addself'){
+    html = sheet(`
+      <h3>加一个自己</h3>
+      <p class="hint">名字最多 8 个字。加完会进入成员名单，别人也能看到。</p>
+      <div class="field"><input id="in-name" maxlength="8" placeholder="比如：老王"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">取消</button>
+        <button class="btn btn-primary" data-act="addself-ok">加上</button>
+      </div>`);
+  }
+  else if (modal.type === 'confirm'){
+    html = sheet(`
+      <h3>${esc(modal.title)}</h3>
+      <p class="hint">${esc(modal.desc)}</p>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">算了</button>
+        <button class="btn ${modal.danger ? 'btn-danger' : 'btn-primary'}" data-act="confirm-ok">${esc(modal.okText || '确定')}</button>
+      </div>`);
+  }
+  else if (modal.type === 'room-edit'){
+    const room = roomOf(S, modal.roomId);
+    if (!room) { modal = null; return; }
+    html = sheet(`
+      <h3>编辑 ${esc(roomName(S, S.session.rooms.indexOf(room)))}</h3>
+      <p class="hint">只会修改这个房间，不影响其他房间。</p>
+      <div class="field"><label>房间号</label><input id="edit-room-no" value="${esc(room.roomNo)}" maxlength="20" placeholder="例如 A101"></div>
+      <div class="field"><label>标题</label><input id="edit-room-title" value="${esc(room.title)}" maxlength="20"></div>
+      <div class="field"><label>地点</label><input id="edit-room-venue" value="${esc(room.venue)}" maxlength="40"></div>
+      <div class="grid2">
+        <div class="field"><label>开打时间</label><input id="edit-room-start" type="datetime-local" value="${toLocalInput(room.startAt)}"></div>
+        <div class="field"><label>开打时长（分钟）</label><input id="edit-room-duration" type="number" min="30" max="720" value="${room.durationMin}"></div>
+      </div>
+      <div class="field"><label>提前几小时截止报名</label><input id="edit-room-deadline" type="number" min="0" max="48" value="${room.deadlineMin / 60}"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">取消</button>
+        <button class="btn btn-primary" data-act="save-room-edit">保存</button>
+      </div>
+      ${isAdmin() ? `<button class="mini d wide history-delete" data-act="delete-room" data-id="${room.id}">删除这个房间及其数据</button>` : ''}`);
+  }
+  else if (modal.type === 'move'){
+    const currentId = mePlayer() && mePlayer().roomId;
+    const rooms = S.session.rooms || [];
+    html = sheet(`
+      <h3>换到哪个房间？</h3>
+      <p class="hint">只能换到有空位的房间，换房间不会影响报名时间和信用分。</p>
+      ${rooms.map((room, i) => {
+        const players = activePlayers(S).filter(player => player.roomId === room.id);
+        const full = players.length >= 4;
+        const mine = room.id === currentId;
+        const closed = Date.now() >= deadlineOf(room) || Date.now() >= roomEndAt(room);
+        return `<button class="btn btn-ghost wide" data-act="move-to" data-id="${room.id}" ${full || mine || closed ? 'disabled' : ''}>
+          ${esc(roomName(S, i))} · ${esc(room.title)} · ${players.length}/4${mine ? ' · 当前房间' : full ? ' · 已满' : closed ? ' · 已截止' : ' · 换到这里'}
+        </button>`;
+      }).join('')}
+      <div class="actions"><button class="btn btn-ghost" data-act="close">先不换</button></div>`);
+  }
+  else if (modal.type === 'settings'){
+    const s = S.session;
+    html = sheet(`
+      <h3>房间设置</h3>
+      <p class="hint">每个房间独立设置房号、标题、地点、开始时间和时长。时间结束后，房间会自动归档到历史。</p>
+      ${(s.rooms || []).map((room, i) => `<div class="room-config">
+        <div class="room-config-title">房间 ${i + 1}</div>
+        <div class="grid2">
+          <div class="field"><label>房间号</label><input data-room-no="${i}" value="${esc(room.roomNo)}" maxlength="20" placeholder="例如 A101"></div>
+          <div class="field"><label>标题</label><input data-room-title="${i}" value="${esc(room.title)}" maxlength="20"></div>
+        </div>
+        <div class="field"><label>地点</label><input data-room-venue="${i}" value="${esc(room.venue)}" maxlength="40"></div>
+        <div class="grid2">
+          <div class="field"><label>开打时间</label><input data-room-start="${i}" type="datetime-local" value="${toLocalInput(room.startAt)}"></div>
+          <div class="field"><label>开打时长（分钟）</label><input data-room-duration="${i}" type="number" min="30" max="720" value="${room.durationMin}"></div>
+        </div>
+        <div class="field"><label>提前几小时截止报名</label><input data-room-deadline="${i}" type="number" min="0" max="48" value="${room.deadlineMin / 60}"></div>
+      </div>`).join('')}
+      ${roomCount(S) < 10 ? '<button class="btn btn-ghost wide" data-act="add-room">＋ 添加房间</button>' : ''}
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">取消</button>
+        <button class="btn btn-primary" data-act="save-settings">保存</button>
+      </div>
+      <button class="btn btn-ghost wide" data-act="roster">成员管理（${S.members.length} 人）</button>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn btn-ghost" data-act="open-score" style="flex:1;background:rgba(232,197,106,.12);color:#e8c56a">房间记分</button>
+      </div>`);
+  }
+  else if (modal.type === 'scores'){
+    const rooms = S.session.rooms || [];
+    html = sheet(`
+      <h3>房间记分</h3>
+      <p class="hint">一个房间一条记录。四个人的分加起来应该是 0，不是 0 会提醒你，但照样能存。</p>
+      ${rooms.length ? rooms.map((room, i) => {
+        const players = activePlayers(S).filter(player => player.roomId === room.id);
+        const e = entryOf(room.id);
+        const sum = e ? e.results.reduce((a, r) => a + r.score, 0) : 0;
+        const names = players.map(p => (memberOf(S, p.memberId) || {}).name).filter(Boolean).join('、');
+        return `<div class="score-row">
+          <div class="nm2">${esc(roomName(S, i))} · ${esc(room.title)}<div class="sub">${esc(names || '暂无报名')}</div></div>
+          ${e
+            ? `<span class="badge2 ${sum === 0 ? 'ok' : 'warn'}">合计 ${sum > 0 ? '+' : ''}${sum}</span>
+               <button class="mini p" data-act="score-table" data-id="${room.id}">改</button>
+               <button class="mini d" data-act="unscore" data-id="${e.id}">删</button>`
+            : `<span class="badge2">未录</span>
+               <button class="mini p" data-act="score-table" data-id="${room.id}">录入</button>`}
+        </div>`;
+      }).join('') : `<div class="empty-tip" style="padding:24px 10px">还没人报名，先等人齐了再记分</div>`}
+      <div class="actions"><button class="btn btn-ghost" data-act="close">关闭</button></div>`);
+  }
+  else if (modal.type === 'score'){
+    const room = roomRecordOf(S, modal.roomId);
+    const t = room
+      ? (roomOf(S, room.id) ? playersForRoom(S, room) : (room.players || []).filter(player => !player.cancelled))
+      : [];
+    const e = room ? entryOf(room.id) : null;
+    html = sheet(`
+      <h3>${esc(room ? room.roomNo : '房间')} · 录入成绩</h3>
+      <p class="hint">填输赢分，赢为正、输为负，比如 +120 / -40。四个人加起来最好是 0。</p>
+      ${t.map((p, i) => {
+        const m = memberOf(S, p.memberId);
+        if (!m) return '';
+        const old = e ? e.results.find(r => r.memberId === p.memberId) : null;
+        return `<div class="list-item">${avHtml(m)}<div class="nm2">${esc(m.name)}</div>
+          <input type="number" data-score="${i}" value="${old ? old.score : 0}" inputmode="numeric"></div>`;
+      }).join('')}
+      <div class="sumline">合计<b id="sum" class="good">0</b></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close-scores">取消</button>
+        <button class="btn btn-primary" data-act="save-score" id="save-score-btn">存进战绩</button>
+      </div>`);
+    setTimeout(updateSum, 0);
+  }
+  else if (modal.type === 'share'){
+    html = sheet(`
+      <h3>发到群里</h3>
+      <p class="hint">点「复制」然后粘到微信群。</p>
+      <div class="field"><textarea id="share-txt" style="height:130px;line-height:1.8;font-size:14px">${esc(modal.text)}</textarea></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="close">关掉</button>
+        <button class="btn btn-primary" data-act="copy-share">复制</button>
+      </div>`);
+  }
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function askWho(){
+  if (!S.members.length && modal && modal.type === 'who') return;
+  modal = { type: 'who' };
+  renderModal();
+}
+
+function syncRoster(){
+  if (!modal || modal.type !== 'roster') return;
+  modal.list = modal.list.map((m, i) => {
+    const row = document.querySelector('[data-row="' + i + '"]');
+    if (!row) return m;
+    const name = row.querySelector('[data-name]').value;
+    const emoji = row.querySelector('[data-emoji]').value;
+    return { ...m, name, emoji, color: m.color || avatarColor(name || '?') };
+  });
+}
+
+/* ===================== 交互 ===================== */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+
+  if (act === 'tab'){ tab = el.dataset.tab; render(); return; }
+  if (act === 'close'){ modal = null; renderModal(); return; }
+  if (act === 'mask'){
+    if (e.target === el && modal && modal.type !== 'who'){ modal = null; renderModal(); }
+    return;
+  }
+
+  if (act === 'who'){ askWho(); return; }
+
+  if (act === 'add-room'){
+    if (roomCount(S) >= 10){ toast('最多添加 10 个房间'); return; }
+    const rooms = (S.session.rooms || []).map(room => ({ ...room }));
+    rooms.push(blankRoom(Date.now(), rooms.length + 1));
+    commit({ t: 'settings', patch: { rooms } });
+    if (modal && modal.type === 'settings') renderModal();
+    toast('已添加房间');
+    return;
+  }
+
+  if (act === 'join-room'){
+    if (!meM()){ askWho(); return; }
+    if (mePlayer()){ toast('你已经报名了一个房间'); return; }
+    commit({ t: 'join', memberId: S.memberId, roomId: el.dataset.id });
+    toast('报名成功');
+    return;
+  }
+
+  if (act === 'edit-room'){
+    modal = { type: 'room-edit', roomId: el.dataset.id };
+    renderModal();
+    return;
+  }
+
+  if (act === 'delete-room'){
+    if (!isAdmin()) { toast('只有该隐cain可以删除数据'); return; }
+    const roomId = el.dataset.id;
+    modal = {
+      type: 'confirm',
+      title: '删除这个房间？',
+      desc: '房间、报名记录、成绩和历史记录都会删除，删除后不能恢复。',
+      okText: '确认删除',
+      danger: true,
+      onOk: () => {
+        modal = null;
+        renderModal();
+        commit({ t: 'delete-room', roomId, actorMemberId: S.memberId });
+        toast('房间数据已删除');
+      }
+    };
+    renderModal();
+    return;
+  }
+
+  if (act === 'save-room-edit'){
+    const roomId = modal && modal.roomId;
+    const rooms = (S.session.rooms || []).map(room => {
+      if (room.id !== roomId) return { ...room };
+      const startText = document.getElementById('edit-room-start').value;
+      return {
+        ...room,
+        roomNo: document.getElementById('edit-room-no').value.trim() || room.roomNo,
+        title: document.getElementById('edit-room-title').value.trim() || '活动报名',
+        venue: document.getElementById('edit-room-venue').value.trim() || '待定',
+        startAt: startText ? new Date(startText).getTime() : room.startAt,
+        durationMin: Math.max(30, Math.min(720, parseInt(document.getElementById('edit-room-duration').value, 10) || room.durationMin)),
+        deadlineMin: Math.max(0, Math.min(2880, (parseFloat(document.getElementById('edit-room-deadline').value) || 0) * 60))
+      };
+    });
+    modal = null;
+    renderModal();
+    commit({ t: 'settings', patch: { rooms } });
+    toast('房间信息已保存');
+    return;
+  }
+
+  if (act === 'move-table'){
+    if (!mePlayer()) { toast('先报名才能换房间'); return; }
+    modal = { type: 'move' };
+    renderModal();
+    return;
+  }
+
+  if (act === 'move-to'){
+    const roomId = el.dataset.id;
+    const current = mePlayer() && mePlayer().roomId;
+    if (!roomId || roomId === current) return;
+    modal = null;
+    renderModal();
+    commit({ t: 'move', memberId: S.memberId, roomId });
+    const room = roomOf(S, roomId);
+    toast('已换到' + (room ? roomName(S, S.session.rooms.indexOf(room)) : '目标房间'));
+    return;
+  }
+
+  if (act === 'pick'){
+    S.memberId = el.dataset.id;
+    save();
+    modal = null; renderModal(); render();
+    toast('好，你是 ' + (memberOf(S, S.memberId) || {}).name);
+    return;
+  }
+
+  if (act === 'toggle'){
+    if (!meM()){ askWho(); return; }
+    if (mePlayer()){
+      const room = roomOf(S, mePlayer().roomId);
+      const late = room && Date.now() > deadlineOf(room);
+      const going = room && Date.now() >= room.startAt;
+      if (late){
+        modal = {
+          type: 'confirm',
+          title: going ? '这局已经开台了' : '已经过报名截止时间',
+          desc: going
+            ? '现在退出会记一次放鸽子，信用 -10。确定要退吗？'
+            : '现在取消会扣 10 点信用分。确定要取消吗？自己找个人替你也行。',
+          okText: '仍然退出', danger: true,
+          onOk: () => { modal = null; renderModal(); commit({ t: 'leave', memberId: S.memberId }); toast('已退出，信用 -10'); }
+        };
+        renderModal();
+      } else {
+        commit({ t: 'leave', memberId: S.memberId });
+        toast('已取消报名');
+      }
+    }
+    return;
+  }
+
+  if (act === 'settings'){ modal = { type: 'settings' }; renderModal(); return; }
+
+  if (act === 'save-settings'){
+    const rooms = (S.session.rooms || []).map((room, i) => {
+      const startText = document.querySelector('[data-room-start="' + i + '"]').value;
+      return {
+        id: room.id,
+        roomNo: document.querySelector('[data-room-no="' + i + '"]').value.trim() || String(i + 1),
+        title: document.querySelector('[data-room-title="' + i + '"]').value.trim() || '活动报名',
+        venue: document.querySelector('[data-room-venue="' + i + '"]').value.trim() || '待定',
+        startAt: startText ? new Date(startText).getTime() : room.startAt,
+        durationMin: Math.max(30, Math.min(720, parseInt(document.querySelector('[data-room-duration="' + i + '"]').value, 10) || 180)),
+        deadlineMin: Math.max(0, Math.min(2880, (parseFloat(document.querySelector('[data-room-deadline="' + i + '"]').value) || 0) * 60))
+      };
+    });
+    modal = null; renderModal();
+    commit({ t: 'settings', patch: { rooms } });
+    toast('已保存');
+    return;
+  }
+
+  if (act === 'roster'){
+    modal = { type: 'roster', list: S.members.map(m => ({ ...m })) };
+    renderModal();
+    return;
+  }
+  if (act === 'roster-add'){
+    syncRoster();
+    modal.list.push({ id: rid('m'), name: '', emoji: '', color: '' });
+    renderModal();
+    return;
+  }
+  if (act === 'roster-del'){
+    syncRoster();
+    modal.list.splice(Number(el.dataset.i), 1);
+    renderModal();
+    return;
+  }
+  if (act === 'roster-save'){
+    syncRoster();
+    const list = modal.list
+      .map(m => ({ ...m, name: String(m.name || '').trim().slice(0, 8) }))
+      .filter(m => m.name);
+    if (!list.length){ toast('至少要留一个人'); return; }
+    const lost = S.memberId && !list.some(m => m.id === S.memberId);
+    if (lost) S.memberId = null;
+    modal = null; renderModal();
+    commit({ t: 'members', list });
+    toast('名单已保存（' + list.length + ' 人）');
+    if (!S.memberId) askWho();
+    return;
+  }
+
+  if (act === 'add-self'){
+    modal = { type: 'addself' };
+    renderModal();
+    setTimeout(() => { const i = document.getElementById('in-name'); if (i) i.focus(); }, 60);
+    return;
+  }
+  if (act === 'addself-ok'){
+    const name = document.getElementById('in-name').value.trim().slice(0, 8);
+    if (!name){ toast('先输个名字'); return; }
+    const id = rid('m');
+    const list = S.members.concat([{ id, name, emoji: '', color: avatarColor(name) }]);
+    S.memberId = id;
+    modal = null; renderModal();
+    commit({ t: 'members', list });
+    render();
+    toast('加好了，你是 ' + name);
+    return;
+  }
+
+  if (act === 'confirm-ok'){
+    const fn = modal && modal.onOk;
+    modal = null;
+    renderModal();
+    if (fn) fn();
+    return;
+  }
+
+  if (act === 'open-score'){
+    if (!seated().length){ toast('还没人报名'); return; }
+    modal = { type: 'scores' };
+    renderModal();
+    return;
+  }
+
+  if (act === 'score-table'){
+    modal = { type: 'score', roomId: el.dataset.id };
+    renderModal();
+    return;
+  }
+
+  if (act === 'score-room'){
+    modal = { type: 'score', roomId: el.dataset.id };
+    renderModal();
+    return;
+  }
+
+  if (act === 'close-scores'){
+    modal = { type: 'scores' };
+    renderModal();
+    return;
+  }
+
+  if (act === 'unscore'){
+    const id = el.dataset.id;
+    commit({ t: 'unscore', id });
+    modal = { type: 'scores' };
+    renderModal();
+    toast('这条成绩删掉了');
+    return;
+  }
+
+  if (act === 'save-score'){
+    const room = roomRecordOf(S, modal.roomId);
+    const t = room
+      ? (roomOf(S, room.id) ? playersForRoom(S, room) : (room.players || []).filter(player => !player.cancelled))
+      : [];
+    const results = t.map((p, i) => ({
+      memberId: p.memberId,
+      score: parseInt(document.querySelector('[data-score="' + i + '"]').value, 10) || 0
+    }));
+    const sum = results.reduce((a, r) => a + r.score, 0);
+    commit({ t: 'score', id: rid('h'), roomId: room && room.id, results });
+    modal = { type: 'scores' };
+    renderModal();
+    toast(sum === 0 ? `${room ? room.roomNo : '房间'}记好了` : `${room ? room.roomNo : '房间'}记好了（合计 ${sum > 0 ? '+' : ''}${sum}，不是 0）`);
+    return;
+  }
+
+  if (act === 'share'){
+    const all = activePlayers(S);
+    const names = all.map(p => (memberOf(S, p.memberId) || {}).name).filter(Boolean).join('、');
+    const text = [
+      `【聚会/活动报名】共 ${roomCount(S)} 个房间`,
+      ...((S.session.rooms || []).map(room => `${room.roomNo}｜${room.title}｜${room.venue}｜${fmtFull(room.startAt)}`)),
+      `已报名 ${all.length} 人：${names || '还没有人'}`,
+      waiting().length ? `候补 ${waiting().length} 人` : '还有空位可以报名',
+      `报名点这里 👉 ${location.href.startsWith('http') ? location.href : '（部署后的链接）'}`,
+    ].join('\n');
+    modal = { type: 'share', text };
+    renderModal();
+    return;
+  }
+
+  if (act === 'copy-share'){
+    const ta = document.getElementById('share-txt');
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    if (!ok && navigator.clipboard){ navigator.clipboard.writeText(ta.value); ok = true; }
+    toast(ok ? '复制好了，去群里粘贴' : '复制失败，手动长按选中');
+    return;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && modal && modal.type === 'addself'){
+    document.querySelector('[data-act="addself-ok"]').click();
+  }
+});
+
+document.addEventListener('input', e => {
+  if (modal && modal.type === 'score' && e.target.matches && e.target.matches('[data-score]')) updateSum();
+});
+
+/* 每秒刷新倒计时 */
+setInterval(() => {
+  if (tab !== 'signup' || modal) return;
+  const before = JSON.stringify([...(S.session.rooms || []).map(room => room.id), ...(S.archivedRooms || []).map(room => room.id)]);
+  normalizeState(S, Date.now());
+  const after = JSON.stringify([...(S.session.rooms || []).map(room => room.id), ...(S.archivedRooms || []).map(room => room.id)]);
+  if (before !== after) save();
+  render();
+}, 1000);
+
+/* ===================== 启动 ===================== */
+async function boot(){
+  if (/^https?:$/.test(location.protocol)){
+    try {
+      const d = await apiGet();
+      ONLINE = true;
+      adopt(d);
+    } catch (e) {
+      ONLINE = false;
+    }
+  }
+  render();
+  if (!S.memberId) askWho();
+  if (ONLINE){
+    setInterval(poll, 5000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  }
+}
+
+async function poll(){
+  if (modal) return;
+  // 还有没发出去的动作，先把它们补上，别用服务器旧数据盖掉本地
+  if (outbox.length || flushing){ flush(); return; }
+  try {
+    const d = await apiGet();
+    if (d.updatedAt !== S.updatedAt) adopt(d);
+  } catch (e) {}
+}
+
+boot();
+</script>
+</body>
+</html>

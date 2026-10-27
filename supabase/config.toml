@@ -1,0 +1,4 @@
+project_id = "gzstcdhxcxnjytzzcrxe"
+
+[functions.majiang-api]
+verify_jwt = false

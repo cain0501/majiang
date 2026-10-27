@@ -473,7 +473,19 @@ function applyOp(state, op, now = Date.now()) {
     }
   } else if (type === 'settings') {
     const patch = op.patch || {};
-    if (Array.isArray(patch.rooms)) session.rooms = cleanRooms(patch.rooms);
+    if (Array.isArray(patch.rooms)) {
+      const previousRooms = new Map(ensureRooms(session, now).map(room => [room.id, room]));
+      const nextRooms = cleanRooms(patch.rooms);
+      if (patch.retroactive) {
+        nextRooms.forEach(room => {
+          const previous = previousRooms.get(room.id);
+          if (previous && previous.startAt > now && room.startAt <= now && !room.startedAt) {
+            room.startedAt = room.startAt;
+          }
+        });
+      }
+      session.rooms = nextRooms;
+    }
     ensureRooms(session, now);
     normalizeRoomAssignments(session, now);
   } else if (type === 'score') {
@@ -1141,22 +1153,25 @@ document.addEventListener('click', e => {
 
   if (act === 'save-room-edit'){
     const roomId = modal && modal.roomId;
+    let retroactive = false;
     const rooms = (S.session.rooms || []).map(room => {
       if (room.id !== roomId) return { ...room };
       const startText = document.getElementById('edit-room-start').value;
+      const startAt = startText ? new Date(startText).getTime() : room.startAt;
+      retroactive = !room.startedAt && room.startAt > Date.now() && startAt <= Date.now();
       return {
         ...room,
         roomNo: document.getElementById('edit-room-no').value.trim() || room.roomNo,
         title: document.getElementById('edit-room-title').value.trim() || '活动报名',
         venue: document.getElementById('edit-room-venue').value.trim() || '待定',
-        startAt: startText ? new Date(startText).getTime() : room.startAt,
+        startAt,
         durationMin: Math.max(30, Math.min(720, parseInt(document.getElementById('edit-room-duration').value, 10) || room.durationMin)),
         deadlineMin: Math.max(0, Math.min(2880, (parseFloat(document.getElementById('edit-room-deadline').value) || 0) * 60))
       };
     });
     modal = null;
     renderModal();
-    commit({ t: 'settings', patch: { rooms } });
+    commit({ t: 'settings', patch: { rooms, retroactive } });
     toast('房间信息已保存');
     return;
   }
@@ -1216,20 +1231,23 @@ document.addEventListener('click', e => {
   if (act === 'settings'){ modal = { type: 'settings' }; renderModal(); return; }
 
   if (act === 'save-settings'){
+    let retroactive = false;
     const rooms = (S.session.rooms || []).map((room, i) => {
       const startText = document.querySelector('[data-room-start="' + i + '"]').value;
+      const startAt = startText ? new Date(startText).getTime() : room.startAt;
+      if (!room.startedAt && room.startAt > Date.now() && startAt <= Date.now()) retroactive = true;
       return {
         id: room.id,
         roomNo: document.querySelector('[data-room-no="' + i + '"]').value.trim() || String(i + 1),
         title: document.querySelector('[data-room-title="' + i + '"]').value.trim() || '活动报名',
         venue: document.querySelector('[data-room-venue="' + i + '"]').value.trim() || '待定',
-        startAt: startText ? new Date(startText).getTime() : room.startAt,
+        startAt,
         durationMin: Math.max(30, Math.min(720, parseInt(document.querySelector('[data-room-duration="' + i + '"]').value, 10) || 180)),
         deadlineMin: Math.max(0, Math.min(2880, (parseFloat(document.querySelector('[data-room-deadline="' + i + '"]').value) || 0) * 60))
       };
     });
     modal = null; renderModal();
-    commit({ t: 'settings', patch: { rooms } });
+    commit({ t: 'settings', patch: { rooms, retroactive } });
     toast('已保存');
     return;
   }

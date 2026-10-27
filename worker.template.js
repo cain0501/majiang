@@ -4,10 +4,17 @@ import { applyOp, defaultState, normalizeState } from './core.js';
 
 const PAGE = __PAGE__;
 
+const corsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type',
+  'cache-control': 'no-store'
+};
+
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' }
+    headers: { 'content-type': 'application/json; charset=utf-8', ...corsHeaders }
   });
 
 async function readState(env, key) {
@@ -29,6 +36,10 @@ export default {
     const key = 'g:' + g;
 
     try {
+      if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/')) {
+        return new Response(null, { status: 204, headers: corsHeaders });
+      }
+
       if (url.pathname === '/api/state') {
         if (request.method !== 'GET') return json({ error: 'method not allowed' }, 405);
         let st = await readState(env, key);

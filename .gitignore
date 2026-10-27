@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.omx/
+_data*.json*
+server.log
+server.err.log
+shot-*.png
+dist/

@@ -1,0 +1,9 @@
+name = "majiang"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# 部署前先建一个 KV 命名空间，把返回的 id 填到这里：
+#   npx wrangler kv namespace create MJ_KV
+[[kv_namespaces]]
+binding = "MJ_KV"
+id = "在这里填你的命名空间 id"

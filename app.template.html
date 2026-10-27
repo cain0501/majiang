@@ -195,9 +195,8 @@
 /* ===================== 本地状态 ===================== */
 const LS_KEY = 'mj_signup_v1';
 const GROUP = new URLSearchParams(location.search).get('g') || 'main';
-const API_ORIGIN = location.hostname === 'cain0501.github.io'
-  ? 'https://majiang.zzljb520.workers.dev'
-  : '';
+const SUPABASE_API = 'https://gzstcdhxcxnjytzzcrxe.supabase.co/functions/v1/majiang-api';
+const API_ORIGIN = location.hostname === 'cain0501.github.io' ? SUPABASE_API : '';
 let ONLINE = false;
 let S = loadState();
 let tab = 'signup';
@@ -217,12 +216,14 @@ function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch 
 
 /* ===================== 云端同步 ===================== */
 async function apiGet(){
-  const r = await fetch(API_ORIGIN + '/api/state?g=' + encodeURIComponent(GROUP), { cache: 'no-store' });
+  const endpoint = API_ORIGIN ? API_ORIGIN + '?g=' + encodeURIComponent(GROUP) : '/api/state?g=' + encodeURIComponent(GROUP);
+  const r = await fetch(endpoint, { cache: 'no-store' });
   if (!r.ok) throw new Error('no api');
   return await r.json();
 }
 async function apiOp(op){
-  const r = await fetch(API_ORIGIN + '/api/op?g=' + encodeURIComponent(GROUP), {
+  const endpoint = API_ORIGIN ? API_ORIGIN + '?g=' + encodeURIComponent(GROUP) : '/api/op?g=' + encodeURIComponent(GROUP);
+  const r = await fetch(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(op)

@@ -364,6 +364,28 @@ ok(cancelledRoom.session.rooms.length === 0 && cancelledRoom.archivedRooms.lengt
 await page.evaluate(() => {
   const now = Date.now();
   localStorage.setItem('mj_signup_v1', JSON.stringify({
+    members: [{ id: 'm1', name: '补录用户', emoji: '', color: 'red', credit: 100 }],
+    session: {
+      id: 'retroactive-session',
+      rooms: [{ id: 'retroactive-room', roomNo: 'R101', title: '手动补录', venue: '测试地点', startAt: now + 3600000, durationMin: 180, deadlineMin: 120 }],
+      players: []
+    },
+    history: [], archivedRooms: [], memberId: 'm1'
+  }));
+});
+await page.reload({ waitUntil: 'load' });
+await sleep(400);
+await page.click('[data-act="settings"]');
+await sleep(200);
+await page.$eval('[data-room-start="0"]', el => { el.value = new Date(Date.now() - 3600000).toISOString().slice(0, 16); });
+await page.click('[data-act="save-settings"]');
+await sleep(400);
+const retroactiveState = await page.evaluate(() => JSON.parse(localStorage.getItem('mj_signup_v1')));
+ok(retroactiveState.session.rooms.length === 0 && retroactiveState.archivedRooms.length === 1, '手动把未来房间改成过去后进入历史');
+
+await page.evaluate(() => {
+  const now = Date.now();
+  localStorage.setItem('mj_signup_v1', JSON.stringify({
     members: [{ id: 'admin', name: '该隐cain', emoji: '', color: 'gold', credit: 100 }, { id: 'user', name: '普通用户', emoji: '', color: 'red', credit: 100 }],
     session: {
       id: 'admin-session',
